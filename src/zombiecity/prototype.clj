@@ -4,17 +4,21 @@
 
 ;; World-grid/Street-generation functions
 (defn generate-grid
-  "Takes a grid-size and returns a MUTABLE grid hashmap. Can be used for world-grid and building-grid generation."
+  "Takes a grid-size and returns a grid hashmap. Can be used for world-grid and building-grid generation."
   [grid-size]
-  (for [xcoord (.subSequence "abcdefghijklmnopqrstuvwxyz" 0 grid-size)
+  (zipmap
+   (for [xcoord (.subSequence "abcdefghijklmnopqrstuvwxyz" 0 grid-size)
         ycoord (range grid-size)]
-    (keyword (str xcoord ycoord)))
+            (keyword (str xcoord ycoord)))
+          (repeat (hash-map)))
   )
 
 (defn generate-grid-paths
-  "Takes a grid hashmap and modifies it to include streets/hallways.  Number of paths is based on size of the grid"
-  [grid]
-
+  "Takes a grid hashmap and modifies it to include streets/hallways.  Number of paths is based on size of the grid. For now, this simply marks each point with :street ["street1"]. Right now, EVERYTHING HAS A STREET. TODO: implement original, complex street idea (direction changes, dead-ends, etc)."
+;;  [grid]
+;;  (dosync
+;;   (doseq [coordinate grid]
+;;     (assoc-in @grid [(first coordinate) :streets] "street1")))
   )
 
 (defn generate-grid-nodes
@@ -24,10 +28,12 @@
   )
 
 (defn generate-buildings
-  "Takes a world-grid, adds streets, and generates buildings along the streets.  Number of buildings is determined by number of streets at the given point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap."
+  "Takes a world-grid, adds streets, and generates buildings along the streets.  Number of buildings is determined by number of streets at the given point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap. TODO: currently just adds four buildings to each coordinate."
   [world-grid]
   (generate-grid-paths world-grid)
   (generate-grid-nodes world-grid)
+  ;; for each coordinate
+  ;; 
 
   )
 
