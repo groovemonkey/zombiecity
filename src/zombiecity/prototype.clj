@@ -6,7 +6,9 @@
 (defn generate-grid
   "Takes a grid-size and returns a MUTABLE grid hashmap. Can be used for world-grid and building-grid generation."
   [grid-size]
-  
+  (for [xcoord (.subSequence "abcdefghijklmnopqrstuvwxyz" 0 grid-size)
+        ycoord (range grid-size)]
+    (keyword (str xcoord ycoord)))
   )
 
 (defn generate-grid-paths
