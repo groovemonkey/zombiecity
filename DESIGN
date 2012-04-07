@@ -1,0 +1,47 @@
+Problems to solve:
+
+#############
+addressing:
+
+        -when we generate additional hashmaps (for building-maps, rooms, furniture, items), how do we know where to attach them on the worldmap?  By referencing the player's current position? (and making sure the generation functions run AFTER the player's position has changed?
+        -if I want to have "addresses" be a part of the user-experience of the game later on, does the chosen scheme allow for this?
+
+######################
+multi-floor buildings:
+
+            -placing stairwell(s), cloning the finished floorplan: fine.
+            -how can I write the stairwell code? Does having multiple floors change addressing?
+            -OK, I've put another level of hashmapping in there: now, each building has a :floors attribute, and {floor1 {}, floor2 {}, etc} hold all the grid data.
+            -stairwells need to be placed, and then when a user goes to a stairwell, s/he should be asked "do you want to go up or down?" (verifying that both directions make sense, of course). Choosing to traverse the stairs should also actually change which floor you are on, and place you UP one floor.
+
+
+
+
+
+
+###############################
+Zombiecity is 
+
+a. a cool game that I want to play
+b. a framework for randomly-generated-city, open-world-walking games
+c. something I can hook the hacker-game onto as an expansion.
+
+#####
+Zombie Outline:
+#####
+
+You're the survivor of a zombie apocalypse, in the middle of an infected city.  Your buddy is waiting at some location, with a chopper that will take you to a hideout in the countryside.
+
+You walk the streets of the city, looking for a way out.  You can go into buildings, apartments, etc -- everything is randomly generated -- and find useful items like weapons, clothing, medicine, and equipment.  You can use everyday objects like furniture, tools, and household chemicals to fight off zombies, and there are plenty of scraps from the "pre-zombie" society to present a rich backstory.
+
+You have a skillset that can be improved through training which affects combat, learning, how well you can secure a location, etc.
+
+Search well, fight hard, and most of all: stay alive and uninfected!
+
+#####
+Framework Outline:
+#####
+-Randomly Generated world map with streets and many different building types.
+-all buildings can be entered and searched.
+-floorplans and rooms that "make sense," containing items that would be likely to be found there.
+-ability to defer room and item generation until they are needed ("lazy" generation), so that the entire world doesn't have to be precomputed, although once generated, rooms and items are persistent.
