@@ -1,6 +1,7 @@
 ;; prototype -- functions and stuff for Zombie City.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(ns zombiecity.prototype)
+(use player)
 
 ;; World-grid/Street-generation functions
 (defn generate-grid
@@ -33,13 +34,36 @@
   (generate-grid-paths world-grid)
   (generate-grid-nodes world-grid)
   ;; for each coordinate
-  ;; 
+  ;; for each [:buildings [direction]]
+  ;; randomly choose a building type from the buildings-list
+  ;; add it to the worldgrid at the appropriate position.
 
   )
 
 
 
 ;; ON BUILDING ACCESS
+(defn attach-building-grid
+  "Attach a new building grid to a location on a map."
+  [location newgrid]
+ '(associate the newgrid with the worldgrid, at the given location)
+  )
+
+
+(defn attach-to-worldgrid
+  "Attach something to the worldgrid. Location is the player's currentlocation, a vector of keywords, like [:grid :buildings :buildingtype :grid :roomtype]; <:roomtype> being the room that is about to be attached. The second arg-- attachment -- is a vector of the room contents, in this example."
+  [location attachment]
+  (def worldgrid (assoc-in worldgrid location attachment))
+  )
+
+
+(defn attach-room
+  "Attach a room to a building location on a map -- takes a location arg in the format [:gridpoint :building :etc] -- should just be the player's currentlocation."
+  [location grid]
+  
+  )
+
+
 (defn enter-building
   "Generate the contents of a building, based on type. If it's a multi-unit or multi-room building, generate a grid for it; otherwise it's a single-room building and we call the furniture-generation function."
   [building]
@@ -48,12 +72,14 @@
    
    ;; generate a grid, using the first and second value from the
    ;; building-type's :min-max-grid-size attribute.
-   (println "generate-building-grid (random (nth (building :type :min-max-grid-size) 0) (nth (building :type :min-max-grid-size) 1))")
+   (attach-building-grid (location building)
+                         (generate-grid (random (nth (building :type :min-max-grid-size) 0) (nth (building :type :min-max-grid-size) 1))))
 
-   ;;otherwise, it's a single-room building. Populate it with furniture.
-   (println "generate-room")
+   ;;otherwise, it's a single-room building. Populate it with
+   ;;furniture and attach to the worldgrid.
+   (attach-room (location building) (generate-room building))
    )
-
+  
   )
 
 
