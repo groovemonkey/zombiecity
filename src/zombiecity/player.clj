@@ -1,3 +1,6 @@
+;; player model
+;;TODO: skills, energy, weight-capacity
+
 (ns zombiecity.player)
 
 (def player

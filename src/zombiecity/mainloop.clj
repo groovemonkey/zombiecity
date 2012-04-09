@@ -1,5 +1,5 @@
 (ns zombiecity.main)
-(use prototype)
+(:use prototype user-input)
 
 
 ;; create worldgrid and buildings
