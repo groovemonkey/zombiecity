@@ -53,7 +53,7 @@
   "Generate the city grid and buildings."
   [size]
   (def worldgrid (generate-grid size))
-  (generate-buildings worldgrid))
+  (generate-buildings))
 
 
 
@@ -94,7 +94,7 @@
     
     ;; if the building we're in is one of the single-unit types...
   (if (contains? single-unit-types current-building-type)
-   (generate-room)
+   (generate-room current-building-type)
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
@@ -102,11 +102,19 @@
         (generate-grid (rand-nth
         (get-in buildingtypes [current-building-type :min-max-grid-size]))))
      
+     ;; at each newly generated 'unit', generate a 'rooms' grid
+       (doseq [coord (get-in worldgrid (player :currentlocation))]
+              (let [unit (keyword (coord 0))]
+                   ;; WORKS -- rooms grid
+                   (attach-to-worldgrid (conj (player :currentlocation) unit)
+                                        (generate-grid 2))
 
-     ;; at each newly generated grid coordinate, generate a room
-     (doseq [coord (get-in worldgrid (player :currentlocation))]
-       (attach-to-worldgrid (conj (player :currentlocation) (coord 0)) (generate-room current-building-type)
-   ))))))
+  ;; for each room, generate room contents
+  (doseq [roomsgrid (get-in worldgrid (conj (player :currentlocation) unit))]
+    (let [room (keyword (roomsgrid 0))]
+         ;; LEVEL 3 -- attach rooms
+         ;(let [room (conj (conj (player :currentlocation) unit
+      (attach-to-worldgrid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
 
 
 
