@@ -13,12 +13,49 @@
    (= choice "move") "dostuff"
    )))
 
+
+;;;;; SUPPORT FUNCTIONS
+(defn is-object-here?
+  "Boolean; takes a string argument, turns it into a keyword, and checks if there's anything by that name in the current location."
+  [object-string]
+  
+  )
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; functions for all actions
 (defn take
   "Pick something up"
   [target &args]
   ;; if there's a take-able "target" in the room, remove it from the
   ;; room and add it to the inventory.
+  )
+
+(defn move
+  "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a KEY -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
+  [place]
+  ;; TODO: is there a less hamfisted way to do this? (redefining
+  ;; player with the new :place added to the :currentlocation map)
+  (def player (assoc-in player [:currentlocation] (conj (player :currentlocation) (keyword place))))
+  )
+
+(defn exit-location
+  "remove the last item on the player's currentlocation vector. I.e. move them 'back' a step."
+  []
+  (def player (assoc-in player [:currentlocation] (pop (player :currentlocation)))))
+
+
+(defn view-currentlocation
+  "looks around at the objects visible at the current playerlocation."
+  []
+  (let [currentview (get-in worldgrid (player :currentlocation))]
+    (doseq
+        [thing currentview]
+      (println "You see a" thing)))
   )
 
 

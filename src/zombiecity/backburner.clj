@@ -19,3 +19,15 @@
   (attach-to-worldgrid location newgrid)
   )
 
+(defn generate-multiunit-building-grid
+  "Create a multi-unit building grid. This applies to apartment and office buildings, which each have many sub-units. Takes an address argument so it knows where to attach the new hashmap."
+  [world-grid-address]
+
+  )
+
+
+(defn generate-unit-grid
+  "Generate the grid for a single multi-room unit: houses, apartments, offices, etc."
+  [world-grid-address]
+  
+  )
