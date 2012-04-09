@@ -7,8 +7,11 @@
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    :apartment-building {
-                        :min-max-grid-size []
-                        :max-stories 7;; max stories it can have
+                        :min-max-grid-size [2 3 4 5 6] ;; list all of
+                        ;; them instead of a range, because we're
+                        ;; choosing randomly from this vector.
+                        
+                        :max-stories [1 2 3 4 5 6 7];; max stories it can have
                         :min-max-rooms [3, 10] ;; each apartment has a
                      ;; max
                         :required-rooms {;; at least one required, but

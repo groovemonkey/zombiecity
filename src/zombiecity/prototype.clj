@@ -2,7 +2,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (ns zombiecity.prototype)
 (:use [clojure.core.incubator :only [dissoc-in]])
-(:use player)
+(:use player buildings items rooms user-input world-generation)
 
 ;; World-grid/Street-generation functions
 (defn generate-grid
@@ -57,37 +57,50 @@
 
 
 
-(defn add-to-inventory
-  "add an item to the inventory (if it's a collection, just prune the whole thing out of the worldgrid map). Takes a string arg."
-  [object]
-  ;; add to inventory
-  (assoc (player :inventory) 0 (get-in worldgrid (conj (player :currentlocation) (keyword object))))
-
-  ;; remove from world
-  (remove-from-worldgrid (player :currentlocation) (keyword object))
-  )
 
 
 
 
-
-(defn enter-building
-  "Generate the contents of a building, based on type. If it's a multi-unit or multi-room building, generate a grid for it; otherwise it's a single-room building and we call the furniture-generation function."
-  [building]
+(defn return-current-buildingtype
+  "Takes the vector (player :currentlocation)) -- returns the current building-type as a keyword. Used to see what kind of rooms should be generated."
+  [playerposition]
   (cond
-   (= (not (or :hairdresser :gun-shop)) (building :type))
+   (empty? playerposition)
+   (println "Holy shit, you're not in a building! DEBUG TRACE: return-current-buildingtype")
    
-   ;; generate a grid, using the first and second value from the
-   ;; building-type's :min-max-grid-size attribute.
-   (attach-building-grid (location building)
-                         (generate-grid (random (nth (building :type :min-max-grid-size) 0) (nth (building :type :min-max-grid-size) 1))))
+   (contains? buildingtypes (last playerposition))
+   (keyword (last playerposition))
+        
+  ;;else recursively search through the currentlocation vector until
+  ;;we find a building type
+   :else (recur (pop playerposition))))
 
-   ;;otherwise, it's a single-room building. Populate it with
-   ;;furniture and attach to the worldgrid.
-   (attach-room (location building) (generate-room building))
-   )
-  
-  )
+
+
+(defn populate-space
+  "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid for it; otherwise it's a single-room building and we call the furniture-generation function."
+  []
+  (let
+      [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
+       multi-unit-types [:office-building :apartment-building]
+       current-building-type (last (player :currentlocation))]
+    
+    ;; if the building we're in is one of the single-unit types...
+  (if (contains? single-unit-types current-building-type)
+   (generate-room)
+
+   ;; otherwise: generate a grid, using the values 
+   ;; from the building-type's :min-max-grid-size attribute.
+   (do 
+     (attach-to-worldgrid (player :currentlocation)
+                        (generate-grid (rand-nth
+                                        (get-in buildingtypes [current-building-type :min-max-grid-size]))))
+     
+     (println "and generate another grid for every apartment/office unit, with appropriate rooms attached")
+     (doseq [coord (get-in worldgrid (player :currentlocation))]
+       (attach-to-worldgrid (vector (coord 0)) (generate-room 
+
+   )))
 
 
 
