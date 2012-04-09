@@ -21,11 +21,12 @@
   (def worldgrid (assoc-in worldgrid location attachment))
   )
 
+
 (defn choose-random-building-type
+  "Rolls between all building types, randomly chooses one. TODO: influence probability of choosing based on a percentage for each building-type."
   []
   (let [list-of-buildings (into (vector) (keys buildingtypes))]
-       (list-of-buildings (rand-int (count (keys buildingtypes)))))
-  )
+       (list-of-buildings (rand-int (count (keys buildingtypes))))))
 
 
 (defn generate-buildings
@@ -33,15 +34,12 @@
   []
   ;; for each coordinate
   (doseq [coord worldgrid]
-    ;; add a :buildings map with :east :west :south :north maps
+    ;; add a :buildings map with :east :west :south :north maps;
+    ;; randomly choose a building type to place there.
     (attach-to-worldgrid (vector (coord 0)) {:buildings {:east {(choose-random-building-type) {}}
                                             :west {(choose-random-building-type) {}}
                                             :north {(choose-random-building-type) {}}
                                             :south {(choose-random-building-type) {}}}})
-                        
-  ;; randomly choose a building type from the buildings-list
-    ;; add it to the worldgrid at the appropriate position.
-    
     ))
 
 
@@ -56,14 +54,21 @@
 
 
 
-;; ON BUILDING ACCESS
-
+;; PLAYER MOVEMENT
 
 (defn move
-  "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a building, direction -- whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
+  "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a KEY -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
   [place]
+  ;; TODO: is there a less hamfisted way to do this? (redefining
+  ;; player with the new :place added to the :currentlocation map)
+  (def player (assoc-in player [:currentlocation] (conj (player :currentlocation) (keyword place))))
+  )
+
+(defn exit-location
+  "remove the last item on the player's currentlocation vector."
+  []
   
-  
+
   )
 
 (defn view-currentlocation
