@@ -60,7 +60,6 @@
 
 
 
-
 (defn return-current-buildingtype
   "Takes the vector (player :currentlocation)) -- returns the current building-type as a keyword. Used to see what kind of rooms should be generated."
   [playerposition]
@@ -77,13 +76,21 @@
 
 
 
+(defn generate-room
+  "Generate furniture for a room."
+  [building-type]
+  {:room "freshly generated"}
+
+  )
+
+
 (defn populate-space
   "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid for it; otherwise it's a single-room building and we call the furniture-generation function."
   []
   (let
       [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
        multi-unit-types [:office-building :apartment-building]
-       current-building-type (last (player :currentlocation))]
+       current-building-type (return-current-buildingtype (player :currentlocation))]
     
     ;; if the building we're in is one of the single-unit types...
   (if (contains? single-unit-types current-building-type)
@@ -91,26 +98,15 @@
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
-   (do 
-     (attach-to-worldgrid (player :currentlocation)
-                        (generate-grid (rand-nth
-                                        (get-in buildingtypes [current-building-type :min-max-grid-size]))))
+   (do (attach-to-worldgrid (player :currentlocation)
+        (generate-grid (rand-nth
+        (get-in buildingtypes [current-building-type :min-max-grid-size]))))
      
-     (println "and generate another grid for every apartment/office unit, with appropriate rooms attached")
+
+     ;; at each newly generated grid coordinate, generate a room
      (doseq [coord (get-in worldgrid (player :currentlocation))]
-       (attach-to-worldgrid (vector (coord 0)) (generate-room 
-
-   )))
-
-
-
-;; ON ROOM ACCESS
-(defn generate-room
-  "Generate furniture for a room."
-  []
-
-  )
-
+       (attach-to-worldgrid (conj (player :currentlocation) (coord 0)) (generate-room current-building-type)
+   ))))))
 
 
 
