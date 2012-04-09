@@ -121,17 +121,23 @@
 
   )
 
+(defn process-user-choice
+  "Takes a string argument (from read-line) and dispatches to different actions based on that. TODO: make multifn?"
+  [playerchoice]
+  (let [splitchoice (map #(.toLowerCase %) (.split playerchoice " "))
+        choice (first splitchoice)
+        args (rest splitchoice)] ;; ("args" "in" "a" "list")
+  (cond
+   (= choice "look") (view-currentlocation)
+   (= choice "move") "dostuff"
+  )))
+
+
 ;; navigation function -- being able to move along a street
 
 
 ;; player model
 ;;;;;current location, inventory, skills, health, energy, weight-capacity
-
-
-;; narration model
-;;;;;;proper description of surroundings (buildings, furniture, items)
-;;;;;;proper description of streets (which direction they go)
-
 
 
 
