@@ -14,15 +14,14 @@
    )))
 
 
+
+
 ;;;;; SUPPORT FUNCTIONS
 (defn is-object-here?
   "Boolean; takes a string argument, turns it into a keyword, and checks if there's anything by that name in the current location."
   [object-string]
-  
+  (contains? (get-in worldgrid (player :currentlocation)) (keyword object-string))
   )
-
-
-
 
 
 
@@ -31,7 +30,10 @@
 (defn take
   "Pick something up"
   [target &args]
-  ;; if there's a take-able "target" in the room, remove it from the
+  ;; if there's a take-able "target" in the room
+  (cond (is-object-here? [target]) ("put it in yo inventory"))
+
+  ;;remove it from the
   ;; room and add it to the inventory.
   )
 

@@ -46,8 +46,7 @@
                         :east {(choose-random-building-type) {}}
                         :west {(choose-random-building-type) {}}
                         :north {(choose-random-building-type) {}}
-                        :south {(choose-random-building-type) {}}}})
-    ))
+                        :south {(choose-random-building-type) {}}}})))
 
 
 (defn generate-world
@@ -55,6 +54,21 @@
   [size]
   (def worldgrid (generate-grid size))
   (generate-buildings worldgrid))
+
+
+
+(defn add-to-inventory
+  "add an item to the inventory (if it's a collection, just prune the whole thing out of the worldgrid map). Takes a string arg."
+  [object]
+  ;; add to inventory
+  (assoc (player :inventory) 0 (get-in worldgrid (conj (player :currentlocation) (keyword object))))
+
+  ;; remove from world
+  (remove-from-worldgrid (player :currentlocation) (keyword object))
+  )
+
+
+
 
 
 (defn enter-building
