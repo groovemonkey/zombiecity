@@ -34,15 +34,15 @@
   ;; for each coordinate
   (doseq [coord worldgrid]
     ;; add a :buildings map with :east :west :south :north maps
-    (attach-to-worldgrid (vector (coord 0)) {:buildings {:east {}
-                                            :west {}
-                                            :north {}
-                                            :south {}}})
+    (attach-to-worldgrid (vector (coord 0)) {:buildings {:east {(choose-random-building-type) {}}
+                                            :west {(choose-random-building-type) {}}
+                                            :north {(choose-random-building-type) {}}
+                                            :south {(choose-random-building-type) {}}}})
                         
   ;; randomly choose a building type from the buildings-list
     ;; add it to the worldgrid at the appropriate position.
     
-    )
+    ))
 
 
 (defn generate-world
