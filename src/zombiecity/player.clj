@@ -1,4 +1,5 @@
 (ns zombiecity.player)
+
 (def player
   {:currentlocation [:a1]
    :health 100

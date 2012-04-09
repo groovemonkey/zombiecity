@@ -67,13 +67,16 @@
 (defn exit-location
   "remove the last item on the player's currentlocation vector."
   []
-  
+  (def player (assoc-in player [:currentlocation] (pop (player :currentlocation)))))
 
-  )
 
 (defn view-currentlocation
   "looks around at the objects visible at the current playerlocation."
-
+  []
+  (let [currentview (get-in worldgrid (player :currentlocation))]
+    (doseq
+        [thing currentview]
+      (println "You see a" thing)))
   )
 
 
