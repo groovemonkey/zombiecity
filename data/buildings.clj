@@ -1,3 +1,5 @@
+(ns zombiecity.prototype)
+
 (def buildingtypes
   {
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -30,13 +32,12 @@
    :hairdresser {
                  :max-stories 1
                  :min-max-rooms 1
-                 :required-rooms {hairdresser-room}
+                 :required-rooms {:hairdresser-room 1}
                  :allowed-rooms {}
                  }
 
 
 
 
-   
    }
   )

@@ -14,41 +14,6 @@
           (repeat (hash-map)))
   )
 
-(defn generate-grid-paths
-  "Takes a grid hashmap and modifies it to include streets/hallways.  Number of paths is based on size of the grid. For now, this simply marks each point with :street ["street1"]. Right now, EVERYTHING HAS A STREET. TODO: implement original, complex street idea (direction changes, dead-ends, etc)."
-;;  [grid]
-;;  (dosync
-;;   (doseq [coordinate grid]
-;;     (assoc-in @grid [(first coordinate) :streets] "street1")))
-  )
-
-(defn generate-grid-nodes
-  "Takes a grid with defined paths and adds nodes to grid-points that have a path attached.  These nodes are either buildings (if a world-map is passed in), units (if a unit-building-map such as an apartment building map is passed in), or rooms (if a single unit's map is passed in)."
-  [grid]
-  
-  )
-
-(defn generate-buildings
-  "Takes a world-grid, adds streets, and generates buildings along the streets.  Number of buildings is determined by number of streets at the given point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap. TODO: currently just adds four buildings to each coordinate."
-  [world-grid]
-  (generate-grid-paths world-grid)
-  (generate-grid-nodes world-grid)
-  ;; for each coordinate
-  ;; for each [:buildings [direction]]
-  ;; randomly choose a building type from the buildings-list
-  ;; add it to the worldgrid at the appropriate position.
-
-  )
-
-
-
-;; ON BUILDING ACCESS
-(defn attach-building-grid
-  "Attach a new building grid to a location on a map."
-  [location newgrid]
- '(associate the newgrid with the worldgrid, at the given location)
-  )
-
 
 (defn attach-to-worldgrid
   "Attach something to the worldgrid. Location is the player's currentlocation, a vector of keywords, like [:grid :buildings :buildingtype :grid :roomtype]; <:roomtype> being the room that is about to be attached. The second arg-- attachment -- is a vector of the room contents, in this example."
@@ -56,11 +21,54 @@
   (def worldgrid (assoc-in worldgrid location attachment))
   )
 
+(defn choose-random-building-type
+  []
+  (let [list-of-buildings (into (vector) (keys buildingtypes))]
+       (list-of-buildings (rand-int (count (keys buildingtypes)))))
+  )
 
-(defn attach-room
-  "Attach a room to a building location on a map -- takes a location arg in the format [:gridpoint :building :etc] -- should just be the player's currentlocation."
-  [location grid]
+
+(defn generate-buildings
+  "Takes a world-grid and generates buildings for each point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap. TODO: currently just adds four buildings to each coordinate."
+  []
+  ;; for each coordinate
+  (doseq [coord worldgrid]
+    ;; add a :buildings map with :east :west :south :north maps
+    (attach-to-worldgrid (vector (coord 0)) {:buildings {:east {}
+                                            :west {}
+                                            :north {}
+                                            :south {}}})
+                        
+  ;; randomly choose a building type from the buildings-list
+    ;; add it to the worldgrid at the appropriate position.
+    
+    )
+
+
+(defn generate-world
+  "Generate the city grid and buildings."
+  [size]
+  (def worldgrid (generate-grid size))
+  (generate-buildings worldgrid)
   
+)
+
+
+
+
+;; ON BUILDING ACCESS
+
+
+(defn move
+  "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a building, direction -- whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
+  [place]
+  
+  
+  )
+
+(defn view-currentlocation
+  "looks around at the objects visible at the current playerlocation."
+
   )
 
 
