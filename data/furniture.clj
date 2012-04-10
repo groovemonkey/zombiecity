@@ -14,7 +14,7 @@
                       }
 
          :bed-old {
-                   :description
+                   :description "This bed has seen a lot. You're not sure what, and you're not sure you *want* to know, but it's a tired old bed and you're inclined to leave it in peace."
                    :usable false
                    :blood-smeared false
                    }

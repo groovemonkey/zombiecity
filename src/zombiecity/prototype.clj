@@ -57,9 +57,6 @@
 
 
 
-
-
-
 (defn return-current-buildingtype
   "Takes the vector (player :currentlocation)) -- returns the current building-type as a keyword. Used to see what kind of rooms should be generated."
   [playerposition]
@@ -79,13 +76,18 @@
 (defn generate-room
   "Generate furniture for a room."
   [building-type]
-  {:room "freshly generated"}
+  ;; randomly choose from required rooms for this building-type
+  (let [chosenroom (keyword (rand-nth (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms]))))))]
+    (println chosenroom)))
+    
+  
 
-  )
+   
+
 
 
 (defn populate-space
-  "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid for it; otherwise it's a single-room building and we call the furniture-generation function."
+  "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid, unit grid, and rooms for it; otherwise it's a single-room building and we call the room-generation function directly."
   []
   (let
       [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
@@ -112,7 +114,7 @@
   ;; for each room, generate room contents
   (doseq [roomsgrid (get-in worldgrid (conj (player :currentlocation) unit))]
     (let [room (keyword (roomsgrid 0))]
-         ;; LEVEL 3 -- attach rooms
+         ;; attach rooms
          ;(let [room (conj (conj (player :currentlocation) unit
       (attach-to-worldgrid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
 

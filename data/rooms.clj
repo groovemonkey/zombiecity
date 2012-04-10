@@ -5,7 +5,10 @@
              :required-furniture [:bed, :dresser]
              :allowed-furniture [:bookcase, :computer-desk]
              }
-   :kitchen
+   :bathroom {
+             :required-furniture [:counter :sink :bathtub :toilet]
+             :allowed-furniture [:mirror :closet :hamper :medicine-cabinet]
+             }
 
 
 
@@ -18,15 +21,4 @@
                                            :hairdresser-stations, :retail-waiting-area, :retail-counter, :hairdresser-equipment-cabinet
                                             ]
                       :allowed-furniture [:magazine-rack]
-                      }
-
-
-
-
-
-
-
-
-
-   } 
-  )
+                      }})
