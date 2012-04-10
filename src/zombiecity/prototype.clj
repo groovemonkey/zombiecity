@@ -74,12 +74,18 @@
 
 
 (defn generate-room
-  "Generate furniture for a room."
+  "Generate furniture for a room. takes a keyword as argument, returns a vector of the room's contents."
   [building-type]
-  ;; randomly choose from required rooms for this building-type
-  (let [chosenroom (keyword (rand-nth (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms]))))))]
-    (println chosenroom)))
-    
+  ;; randomly choose from required/allowed rooms for this building-type
+  (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
+  
+      ;; for each of this room's required and allowed furniture types
+    (doseq [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
+      
+      ;; choose an actual item from that type
+      (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
+
+        ))))
   
 
    
