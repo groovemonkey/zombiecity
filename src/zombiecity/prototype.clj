@@ -73,29 +73,25 @@
 
 
 (defn generate-room
-  "Generate furniture for a room. Takes a location vector and a building-type keyword as arguments; generates a room and attaches it at the attachment location."
-  [location building-type]
+  "generate furniture for a room. takes a building-type keyword as an argument; generates a room and returns it in ':room-type [contents]' format."
+  [building-type]
   ;; randomly choose from required/allowed rooms for this building-type
-  (hash-map (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
-              ;; TODO: attach the keyword at the currentlocation ({:keyword []})
-              ;; with an empty vector next to it? (paired)
-              ;;(attach-to-worldgrid location object)
-                                   
+  (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
 
+    ;; build/return a hash map of :chosenroom [contents]
+    (hash-map chosenroom (into (vector) (flatten
+              
     ;; for each of this room's required and allowed furniture types
     (for [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
       
       ;; choose an actual item from that type
-      (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
-        ;; TODO: Attach the item
-        )))))
-
+         (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
+        (list chosen-item)
+        )))))))
    
 
-
-
 (defn populate-space
-  "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid, unit grid, and rooms for it; otherwise it's a single-room building and we call the room-generation function directly."
+  "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid, unit grid, and rooms for it; otherwise it's a single-room building and we just call the room-generation function."
   []
   (let
       [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
@@ -104,7 +100,7 @@
     
     ;; if the building we're in is one of the single-unit types...
   (if (contains? single-unit-types current-building-type)
-   (generate-room (player :currentlocation) current-building-type)
+   (attach-to-worldgrid (player :currentlocation) (generate-room (player :currentlocation) current-building-type))
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
@@ -123,8 +119,8 @@
   (doseq [roomsgrid (get-in worldgrid (conj (player :currentlocation) unit))]
     (let [room (keyword (roomsgrid 0))]
          ;; attach rooms
-         ;(let [room (conj (conj (player :currentlocation) unit
-      (generate-room (conj (conj (player :currentlocation) unit) room)  current-building-type)))))))))
+         ;DEBUG:
+      (attach-to-worldgrid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
 
 
 

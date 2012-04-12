@@ -42,9 +42,9 @@
   ;; if the place we just moved to is empty, generate some
   ;; stuff for it TODO: I smell an inventory exploit here (take
   ;; everything from a closet, and it regenerates as soon as you go
-  ;; back into it). Fix that.
-  (cond (empty? (get-in worldgrid (player :currentlocation))
-                (populate-space))))
+  ;; back into it). Fix that. ? Add a 'been-here' attribute to containers?
+  (cond (empty? (get-in worldgrid (player :currentlocation)))
+                (populate-space)))
 
 
 (defn exit-location
