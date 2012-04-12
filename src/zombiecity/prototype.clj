@@ -12,15 +12,14 @@
    (for [xcoord (.subSequence "abcdefghijklmnopqrstuvwxyz" 0 grid-size)
         ycoord (range grid-size)]
             (keyword (str xcoord ycoord)))
-          (repeat (hash-map)))
-  )
+          (repeat (hash-map))))
 
 
 (defn attach-to-worldgrid
   "Attach something to the worldgrid. Location is the player's currentlocation, a vector of keywords, like [:grid :buildings :buildingtype :grid :roomtype]; <:roomtype> being the room that is about to be attached. The second arg-- attachment -- is a vector of the room contents, in this example."
   [location object]
-  (def worldgrid (assoc-in worldgrid location object))
-  )
+  (def worldgrid (assoc-in worldgrid location object)))
+
 
 (defn remove-from-worldgrid
   "Remove an object (and its associated map) from the worldgrid -- used for picking up items, etc"
@@ -58,7 +57,7 @@
 
 
 (defn return-current-buildingtype
-  "Takes the vector (player :currentlocation)) -- returns the current building-type as a keyword. Used to see what kind of rooms should be generated."
+  "Takes the vector (player :currentlocation)) -- recursively searches backwards through the currentlocation map until it finds a building type listed in the 'buildingtypes' variable. Returns the current building-type as a keyword."
   [playerposition]
   (cond
    (empty? playerposition)
@@ -74,18 +73,21 @@
 
 
 (defn generate-room
-  "Generate furniture for a room. takes a keyword as argument, returns a vector of the room's contents."
-  [building-type]
+  "Generate furniture for a room. Takes a location vector and a building-type keyword as arguments; generates a room and attaches it at the attachment location."
+  [location building-type]
   ;; randomly choose from required/allowed rooms for this building-type
   (hash-map (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
-    (keyword chosenroom)
+              ;; TODO: attach the keyword at the currentlocation ({:keyword []})
+              ;; with an empty vector next to it? (paired)
+              ;;(attach-to-worldgrid location object)
+                                   
 
     ;; for each of this room's required and allowed furniture types
     (for [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
       
       ;; choose an actual item from that type
       (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
-        (vector chosen-item)
+        ;; TODO: Attach the item
         )))))
 
    
