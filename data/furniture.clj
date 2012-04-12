@@ -27,7 +27,7 @@
          }
 
    :counter {
-             :all-purpose {
+             :all-purpose-counter {
                            :description "An all-purpose counter; built sturdy and kept clean."
                            :usable false
                            :blood-smeared false

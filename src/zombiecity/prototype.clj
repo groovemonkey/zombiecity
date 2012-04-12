@@ -77,16 +77,16 @@
   "Generate furniture for a room. takes a keyword as argument, returns a vector of the room's contents."
   [building-type]
   ;; randomly choose from required/allowed rooms for this building-type
-  (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
-  
-      ;; for each of this room's required and allowed furniture types
-    (doseq [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
+  (hash-map (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
+    (keyword chosenroom)
+
+    ;; for each of this room's required and allowed furniture types
+    (for [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
       
       ;; choose an actual item from that type
       (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
-
-        ))))
-  
+        (vector chosen-item)
+        )))))
 
    
 
@@ -102,7 +102,7 @@
     
     ;; if the building we're in is one of the single-unit types...
   (if (contains? single-unit-types current-building-type)
-   (generate-room current-building-type)
+   (generate-room (player :currentlocation) current-building-type)
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
@@ -122,7 +122,7 @@
     (let [room (keyword (roomsgrid 0))]
          ;; attach rooms
          ;(let [room (conj (conj (player :currentlocation) unit
-      (attach-to-worldgrid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
+      (generate-room (conj (conj (player :currentlocation) unit) room)  current-building-type)))))))))
 
 
 
