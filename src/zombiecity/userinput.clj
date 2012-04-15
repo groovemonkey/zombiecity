@@ -1,6 +1,8 @@
-(ns user-input)
-(:use player prototype)
+(ns userinput
+(:use zombiecity.data.player))
 
+(declare worldgrid)
+(declare remove-from-worldgrid)
 
 ;;;;; SUPPORT FUNCTIONS
 (defn is-object-here?
@@ -69,8 +71,6 @@
 
   ;; if not, return "Calm down, there's no "target"s to fight here."
   )
-
-
 
 
 

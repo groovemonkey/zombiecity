@@ -1,3 +1,5 @@
+(ns zombiecity.data.rooms)
+
 (def roomtypes
   {
    ;; apartment-building rooms

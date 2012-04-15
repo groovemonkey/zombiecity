@@ -1,7 +1,7 @@
 ;; player model
 ;;TODO: skills, energy, weight-capacity
 
-(ns zombiecity.player)
+(ns zombiecity.data.player)
 
 (def player
   {:currentlocation [:a1]

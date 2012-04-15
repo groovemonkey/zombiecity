@@ -1,3 +1,5 @@
+(ns zombiecity.data.furniture)
+
 (def furnituretypes
   {
 

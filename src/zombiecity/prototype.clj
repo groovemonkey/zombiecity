@@ -1,8 +1,11 @@
 ;; prototype -- functions and stuff for Zombie City.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(ns zombiecity.prototype)
-(:use [clojure.core.incubator :only [dissoc-in]])
-(:use player buildings items rooms user-input world-generation)
+(ns zombiecity.prototype
+  (:gen-class)
+  (:use [clojure.core.incubator :only [dissoc-in]])
+  (:use zombiecity.data.buildings zombiecity.data.player zombiecity.data.furniture zombiecity.data.items zombiecity.data.rooms)
+  )
+
 
 ;; World-grid/Street-generation functions
 (defn generate-grid
@@ -18,7 +21,8 @@
 (defn attach-to-worldgrid
   "Attach something to the worldgrid. Location is the player's currentlocation, a vector of keywords, like [:grid :buildings :buildingtype :grid :roomtype]; <:roomtype> being the room that is about to be attached. The second arg-- attachment -- is a vector of the room contents, in this example."
   [location object]
-  (def worldgrid (assoc-in worldgrid location object)))
+  (dosync
+   (alter worldgrid assoc-in location object)))
 
 
 (defn remove-from-worldgrid
@@ -51,7 +55,7 @@
 (defn generate-world
   "Generate the city grid and buildings."
   [size]
-  (def worldgrid (generate-grid size))
+  (def worldgrid (ref (generate-grid size)))
   (generate-buildings))
 
 

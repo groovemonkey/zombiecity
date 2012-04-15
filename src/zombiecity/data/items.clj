@@ -1,3 +1,5 @@
+(ns zombiecity.data.items)
+
 (def itemlist
   {
 

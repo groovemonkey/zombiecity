@@ -1,4 +1,4 @@
-(ns zombiecity.prototype)
+(ns zombiecity.data.buildings)
 
 (def buildingtypes
   {
