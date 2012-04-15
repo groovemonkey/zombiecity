@@ -1,10 +1,26 @@
 ;; prototype -- functions and stuff for Zombie City.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(ns zombiecity.prototype
+(ns zombiecity.core
   (:gen-class)
   (:use [clojure.core.incubator :only [dissoc-in]])
-  (:use zombiecity.data.buildings zombiecity.data.player zombiecity.data.furniture zombiecity.data.items zombiecity.data.rooms)
-  )
+  (:use zombiecity.data.buildings zombiecity.data.furniture zombiecity.data.items zombiecity.data.rooms))
+
+(declare worldgrid)
+
+(def player
+  (ref
+  {:currentlocation [:a1]
+   :health 100
+   :infection 0
+   :inventory []
+   :clothing {:head []
+              :torso []
+              :legs []
+              :feet []
+              :hands [];; max 2 items (1 in each hand)
+              }
+   }
+  ))
 
 
 ;; World-grid/Street-generation functions
@@ -28,7 +44,8 @@
 (defn remove-from-worldgrid
   "Remove an object (and its associated map) from the worldgrid -- used for picking up items, etc"
   [location object]
-  (def worldgrid (dissoc-in worldgrid location object)))
+  (dosync
+   (alter worldgrid dissoc-in location object)))
 
 
 (defn choose-random-building-type
@@ -42,7 +59,7 @@
   "Takes a world-grid and generates buildings for each point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap. TODO: currently just adds four buildings to each coordinate."
   []
   ;; for each coordinate
-  (doseq [coord worldgrid]
+  (doseq [coord @worldgrid]
     ;; add a :buildings map with :east :west :south :north maps;
     ;; randomly choose a building type to place there.
     (attach-to-worldgrid (vector (coord 0)) {:buildings {

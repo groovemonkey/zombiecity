@@ -1,8 +1,5 @@
-(ns userinput
-(:use zombiecity.data.player))
-
-(declare worldgrid)
-(declare remove-from-worldgrid)
+(ns zombiecity.userinput
+(:use zombiecity.core))
 
 ;;;;; SUPPORT FUNCTIONS
 (defn is-object-here?
@@ -16,7 +13,8 @@
   "add an item to the inventory (if it's a collection, just prune the whole thing out of the worldgrid map). Takes a string arg."
   [object]
   ;; add to inventory
-  (assoc (player :inventory) 0 (get-in worldgrid (conj (player :currentlocation) (keyword object))))
+  (dosync
+   (alter player assoc ((player :inventory) 0) (get-in worldgrid (conj (player :currentlocation) (keyword object)))))
 
   ;; remove from world
   (remove-from-worldgrid (player :currentlocation) (keyword object)))
@@ -39,7 +37,8 @@
   [place]
   ;; TODO: is there a less hamfisted way to do this? (redefining
   ;; player with the new :place added to the :currentlocation map)
-  (def player (assoc-in player [:currentlocation] (conj (player :currentlocation) (keyword place))))
+  (dosync
+   (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (keyword place))))
 
   ;; if the place we just moved to is empty, generate some
   ;; stuff for it TODO: I smell an inventory exploit here (take
@@ -52,7 +51,8 @@
 (defn exit-location
   "remove the last item on the player's currentlocation vector. I.e. move them 'back' a step."
   []
-  (def player (assoc-in player [:currentlocation] (pop (player :currentlocation)))))
+  (dosync
+  (alter player assoc-in [:currentlocation] (pop (player :currentlocation)))))
 
 
 (defn view-currentlocation

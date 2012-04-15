@@ -1,12 +1,14 @@
 (ns zombiecity.mainloop
-(:use zombiecity.prototype zombiecity.userinput))
+  (:use zombiecity.userinput
+        zombiecity.core
+        ))
+
 
 ;; create worldgrid and buildings
 (defn initialize
   "Create worldgrid and buildings at a default size, for testing."
   []
-  (generate-world 3)
-)
+  (generate-world 3))
 
 
 ;; PLAYER LOOP
