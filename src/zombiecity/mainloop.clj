@@ -18,7 +18,8 @@
   (do
     (println "Starting the game...\n\n")
     (initialize)
-    (view-currentlocation)
-    (println "What do you do next?")
-    (process-user-choice (read-line))
-))
+    (while true
+      (do
+      (view-currentlocation)
+      (process-user-choice))
+)))

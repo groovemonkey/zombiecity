@@ -14,7 +14,7 @@
   [object]
   ;; add to inventory
   (dosync
-   (alter player assoc ((player :inventory) 0) (get-in worldgrid (conj (player :currentlocation) (keyword object)))))
+   (alter player assoc ((player :inventory) 0) (get-in @worldgrid (conj (player :currentlocation) (keyword object)))))
 
   ;; remove from world
   (remove-from-worldgrid (player :currentlocation) (keyword object)))
@@ -33,18 +33,20 @@
 
 
 (defn move
-  "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a KEY -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
+  "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a LIST -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
   [place]
-  ;; TODO: is there a less hamfisted way to do this? (redefining
-  ;; player with the new :place added to the :currentlocation map)
   (dosync
-   (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (keyword place))))
+   ;; TODO: check if the option is valid, i.e. if it can be seen from
+   ;; the player's currentlocation
 
+   ;; change the player's currentlocation to make the move
+   (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (keyword (first place)))))
+  
   ;; if the place we just moved to is empty, generate some
   ;; stuff for it TODO: I smell an inventory exploit here (take
   ;; everything from a closet, and it regenerates as soon as you go
   ;; back into it). Fix that. ? Add a 'been-here' attribute to containers?
-  (cond (empty? (get-in worldgrid (player :currentlocation)))
+  (cond (empty? (get-in @worldgrid (player :currentlocation)))
                 (populate-space)))
 
 
@@ -56,12 +58,24 @@
 
 
 (defn view-currentlocation
-  "looks around at the objects visible at the current playerlocation."
+  "looks around at the objects visible at the current playerlocation, and displays the options 'one up the chain' from there."
   []
-  (let [currentview (get-in worldgrid (player :currentlocation))]
-    (doseq
-        [thing currentview]
-      (println "You see a" thing))))
+  (let [currentview (get-in @worldgrid (player :currentlocation))]
+
+    (doseq [thing currentview]
+      ;;TODO: fix this crap. when you walk into a hairdresser's,
+      ;;everything crashes. Apartment buildings are even more fucked
+      ;;up. Get this working so we can move through the world, just to
+      ;;start with.
+      (if (vector? (rest thing))
+        ("You see the following:\n" (rest thing))
+
+        (do  ;; else...
+          (println "\n\nYou see a" (first thing) ", from which you have the following options:\n")
+        
+          (doseq [one-further (get-in @worldgrid (conj (player :currentlocation) (first thing)))]
+            (println (first one-further))
+            ))))))
 
 
 (defn fight
@@ -76,9 +90,11 @@
 
 ;; main marshalling function
 (defn process-user-choice
-  "Takes a string argument (from read-line) and dispatches to different actions based on that. TODO: make multifn?"
-  [playerchoice]
-  (let [splitchoice (map #(.toLowerCase %) (.split playerchoice " "))
+  "Takes a string (from read-line) and dispatches to different actions based on that. TODO: make multifn?"
+  []
+  (println "\n\nWhat do you do next?")
+  (let [playerchoice (read-line)
+        splitchoice (map #(.toLowerCase %) (.split playerchoice " "))
         choice (first splitchoice)
         args (rest splitchoice)] ;; ("args" "in" "a" "list")
   (cond

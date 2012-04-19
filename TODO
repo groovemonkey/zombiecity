@@ -1,0 +1,27 @@
+sample 'moving through the world' functionality:
+
+-I start on a gridpoint, and see some "buildings" in different directions:
+
+#################
+IF ON GRIDPOINT:
+
+"West, you see a an apartment building."
+(typing 'west' gets me to the apartment building without having to type "buildings -- west -- apartment-building")
+
+
+#################
+IF IN BUILDING: you can't just be in a building.  You have to be on a sub-building grid (either a building gridpoint or a unit gridpoint ('room'))
+
+#################
+IF IN ROOM:
+
+"You're standing in a <room-type>. You can see
+-a dresser
+-a bookcase
+-a <xyz>"
+
+#################
+IMPLEMENT 'search' command:
+
+searching a given item runs a check to make sure that our current location 'contains' this function (using 'is-object-here?').
+

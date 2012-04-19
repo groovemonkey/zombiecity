@@ -120,8 +120,8 @@
        current-building-type (return-current-buildingtype (player :currentlocation))]
     
     ;; if the building we're in is one of the single-unit types...
-  (if (contains? single-unit-types current-building-type)
-   (attach-to-worldgrid (player :currentlocation) (generate-room (player :currentlocation) current-building-type))
+    (if (not (contains? multi-unit-types current-building-type))
+      (attach-to-worldgrid (player :currentlocation) (generate-room current-building-type))
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
@@ -130,17 +130,16 @@
         (get-in buildingtypes [current-building-type :min-max-grid-size]))))
      
      ;; at each newly generated 'unit', generate a 'rooms' grid
-       (doseq [coord (get-in worldgrid (player :currentlocation))]
+       (doseq [coord (get-in @worldgrid (player :currentlocation))]
               (let [unit (keyword (coord 0))]
                    ;; WORKS -- rooms grid
                    (attach-to-worldgrid (conj (player :currentlocation) unit)
                                         (generate-grid 2))
 
   ;; for each room, generate room contents
-  (doseq [roomsgrid (get-in worldgrid (conj (player :currentlocation) unit))]
+  (doseq [roomsgrid (get-in @worldgrid (conj (player :currentlocation) unit))]
     (let [room (keyword (roomsgrid 0))]
          ;; attach rooms
-         ;DEBUG:
       (attach-to-worldgrid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
 
 
