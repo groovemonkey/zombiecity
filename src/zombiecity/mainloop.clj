@@ -20,6 +20,6 @@
     (initialize)
     (while true
       (do
-      (view-currentlocation)
+      (view-currentlocation worldgrid)
       (process-user-choice worldgrid))
 )))

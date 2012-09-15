@@ -66,7 +66,7 @@
                          }
 
    :retail-counter {
-                    :hairdresser {
+                    :hairdresser-counter {
                                   :description "A small point-of-sale counter where customers could pay for their haircuts, if there were power, and there were customers, and things like haircuts still mattered. It's unlikely that anyone will be using it soon."
                                   :usable false
                                   :blood-smeared true
@@ -75,7 +75,6 @@
 
    :hairdresser-equipment-cabinet {
                                    :description "A cabinet containing...well, whatever a hairdresser might need, you suppose."
-                                   :required-items []
                                    :allowed-items [
                                                    :hairspray
                                                    :scissors

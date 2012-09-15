@@ -43,7 +43,8 @@
    (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (keyword (first place)))))
   
   ;; if the place we just moved to is empty, generate some
-  ;; stuff for it TODO: I smell an inventory exploit here (take
+  ;; stuff for it 
+  ;;;;TODO: I smell an inventory exploit here (take
   ;; everything from a closet, and it regenerates as soon as you go
   ;; back into it). Fix that. ? Add a 'been-here' attribute to containers?
   (cond (empty? (get-in @grid (player :currentlocation)))
@@ -61,20 +62,23 @@
   "looks around at the objects visible at the current playerlocation, and displays the options 'one up the chain' from there."
   [grid]
   (let [currentview (get-in @grid (player :currentlocation))]
+    
+    (println "DEBUG: currentview is" currentview)
+    
     (doseq [thing currentview]
       ;;TODO: fix this crap. when you walk into a hairdresser's,
       ;;everything crashes. Apartment buildings are even more fucked
       ;;up. Get this working so we can move through the world, just to
       ;;start with.
-      (if (vector? (rest thing))
-        ("You see the following:\n" (rest thing))
-
-        (do  ;; else...
-          (println "\n\nYou see a" (first thing) ", from which you have the following options:\n")
-        
-          (doseq [one-further (get-in @worldgrid (conj (player :currentlocation) (first thing)))]
-            (println (first one-further))
-            ))))))
+      (println "DEBUG: thing in the currentview is" thing)
+      
+      (cond (or (empty? thing) (nil? thing)) (println "There's nothing here!")
+            (vector? (rest thing)) (println "You see the following:\n" (rest thing))
+            :else (do
+                    (println "\n\nYour current worldmap is\n\n" @grid "\n\nYou see a" (first thing) ", from which you have the following options:\n")
+                    (doseq [one-further (get-in @grid (conj (player :currentlocation) (first thing)))]
+                      (println (first one-further)))
+                      )))))
 
 
 (defn fight
@@ -97,7 +101,7 @@
         choice (first splitchoice)
         args (rest splitchoice)] ;; ("args" "in" "a" "list")
   (cond
-   (= choice "look") (view-currentlocation)
+   (= choice "look") (view-currentlocation grid)
    (= choice "move") (move grid args)
    (= choice "leave") (exit-location)
    (= choice "take") (take-item grid args)

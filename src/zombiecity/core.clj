@@ -10,7 +10,7 @@
 
 (def player
   (ref
-  {:currentlocation [:a1]
+  {:currentlocation [[0,0]]
    :health 100
    :infection 0
    :inventory []
@@ -158,10 +158,10 @@
               
     ;; for each of this room's required and allowed furniture types
     (for [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
-      
+        
       ;; choose an actual item from that type
          (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
-        (list chosen-item)
+           (vector chosen-item (get-in furnituretypes [furniture-type chosen-item]))
         )))))))
    
 
@@ -171,30 +171,31 @@
   (let
       [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
        multi-unit-types [:office-building :apartment-building]
-       current-building-type (return-current-buildingtype (player :currentlocation))]
+       currentlocation (@player :currentlocation)
+       current-building-type (return-current-buildingtype currentlocation)]
     
     ;; if the building we're in is one of the single-unit types...
     (if (not (contains? multi-unit-types current-building-type))
-      (attach-to-grid @grid (player :currentlocation) (generate-room current-building-type))
+      (attach-to-grid grid currentlocation (generate-room current-building-type))
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
-   (do (attach-to-grid @grid (player :currentlocation)
+   (do (attach-to-grid grid currentlocation
         (generate-grid (rand-nth
         (get-in buildingtypes [current-building-type :min-max-grid-size]))))
      
      ;; at each newly generated 'unit', generate a 'rooms' grid
-       (doseq [coord (get-in @grid (player :currentlocation))]
+       (doseq [coord (get-in @grid currentlocation)]
               (let [unit (keyword (coord 0))]
                    ;; WORKS -- rooms grid
-                   (attach-to-grid @grid (conj (player :currentlocation) unit)
+                   (attach-to-grid grid (conj currentlocation unit)
                                         (generate-grid 2))
 
   ;; for each room, generate room contents
-  (doseq [roomsgrid (get-in @worldgrid (conj (player :currentlocation) unit))]
+  (doseq [roomsgrid (get-in @worldgrid (conj currentlocation unit))]
     (let [room (keyword (roomsgrid 0))]
          ;; attach rooms
-      (attach-to-grid @grid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
+      (attach-to-grid grid (conj (conj currentlocation unit) room) (generate-room current-building-type))))))))))
 
 
 
