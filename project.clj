@@ -5,4 +5,5 @@
                  [lein-swank "1.4.4"]]
   :main zombiecity.mainloop
   :resources-path "data/"
+  :dev-dependencies [[lein-eclipse "1.0.0"]]
 )
