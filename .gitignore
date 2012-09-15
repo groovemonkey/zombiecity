@@ -6,3 +6,9 @@
 /.lein-failures
 /checkouts
 /.lein-deps-sum
+target/
+
+.project
+.eclipse/
+*.launch
+
