@@ -5,6 +5,7 @@ Next Items On The To-Do List:
 	-when you enter a building, a new grid/room is generated. Your currentlocation isn't updated to reflect that, which might be the problem.
 	-try doing room generation earlier? Or eliminating an "extra room" that's generated for single-room buildings like :hairdresser?
 	
+- ADD FURNITURE AND ITEMS FOR AUTO-GENERATION TESTING!!!
 
 
 

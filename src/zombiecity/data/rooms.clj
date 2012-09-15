@@ -15,6 +15,10 @@
              :required-furniture [:desk :phone :filing-cabinet]
              :allowed-furniture [:mirror :closet ]
                }
+   :kitchen {
+             :required-furniture [:counter :sink :stove :fridge]
+             :allowed-furniture [:knife-rack :bread-box]
+             }
 
 
 
