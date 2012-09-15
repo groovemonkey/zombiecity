@@ -1,3 +1,13 @@
+Next Items On The To-Do List:
+
+- core/generate-room still doesn't create a room the way I want it (with containers that are filled, etc)
+- when you enter buildings, the view-currentlocation function crashes the game (the 'move' function might also be to blame)
+	-when you enter a building, a new grid/room is generated. Your currentlocation isn't updated to reflect that, which might be the problem.
+	-try doing room generation earlier? Or eliminating an "extra room" that's generated for single-room buildings like :hairdresser?
+	
+
+
+
 #################
 IF ON GRIDPOINT:
 
