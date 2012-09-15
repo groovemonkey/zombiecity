@@ -34,7 +34,7 @@
 
 (defn move
   "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a LIST -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
-  [place]
+  [grid place]
   (dosync
    ;; TODO: check if the option is valid, i.e. if it can be seen from
    ;; the player's currentlocation
@@ -46,8 +46,8 @@
   ;; stuff for it TODO: I smell an inventory exploit here (take
   ;; everything from a closet, and it regenerates as soon as you go
   ;; back into it). Fix that. ? Add a 'been-here' attribute to containers?
-  (cond (empty? (get-in @worldgrid (player :currentlocation)))
-                (populate-space worldgrid)))
+  (cond (empty? (get-in @grid (player :currentlocation)))
+                (populate-space grid)))
 
 
 (defn exit-location
@@ -59,9 +59,8 @@
 
 (defn view-currentlocation
   "looks around at the objects visible at the current playerlocation, and displays the options 'one up the chain' from there."
-  []
-  (let [currentview (get-in @worldgrid (player :currentlocation))]
-
+  [grid]
+  (let [currentview (get-in @grid (player :currentlocation))]
     (doseq [thing currentview]
       ;;TODO: fix this crap. when you walk into a hairdresser's,
       ;;everything crashes. Apartment buildings are even more fucked
@@ -99,8 +98,9 @@
         args (rest splitchoice)] ;; ("args" "in" "a" "list")
   (cond
    (= choice "look") (view-currentlocation)
-   (= choice "move") (move args)
+   (= choice "move") (move grid args)
    (= choice "leave") (exit-location)
    (= choice "take") (take-item grid args)
    (= choice "fight") (fight args)
+   (= choice "worldgrid") (println "worldgrid is:\n\n" @grid)
    )))
