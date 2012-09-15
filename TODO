@@ -2,6 +2,9 @@ sample 'moving through the world' functionality:
 
 -I start on a gridpoint, and see some "buildings" in different directions:
 
+IMPORTANT: attach-to-worldgrid, remove-from-worldgrid, generate-buildings, etc -- abstract use of global worldgrid away from them; just pass in the grid you want to modify?
+Coordinates should be vectors
+
 #################
 IF ON GRIDPOINT:
 

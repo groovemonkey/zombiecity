@@ -5,6 +5,7 @@
   (:use [clojure.core.incubator :only [dissoc-in]])
   (:use zombiecity.data.buildings zombiecity.data.furniture zombiecity.data.items zombiecity.data.rooms))
 
+;;TODO: still needed after removing worldgrid global from functions? (i.e. when we're passing the worldgrid object in?)
 (declare worldgrid)
 
 (def player
@@ -28,24 +29,74 @@
   "Takes a grid-size and returns a grid hashmap. Can be used for world-grid and building-grid generation."
   [grid-size]
   (zipmap
-   (for [xcoord (.subSequence "abcdefghijklmnopqrstuvwxyz" 0 grid-size)
+   (for [xcoord (range grid-size)
         ycoord (range grid-size)]
-            (keyword (str xcoord ycoord)))
+            (vec [xcoord ycoord]))
           (repeat (hash-map))))
 
 
-(defn attach-to-worldgrid
+(defn attach-to-grid
+  "Attach something to a grid (deref the map you pass in here). Location is the player's currentlocation, a vector of keywords, like [:grid :buildings :buildingtype :grid :roomtype]; <:roomtype> being the room that is about to be attached. The second arg-- attachment -- is a vector of the room contents, in this example."
+  [grid location object]
+  (dosync
+   (alter grid assoc-in location object)))
+
+
+(defn remove-from-grid
+  "Remove an object (and its associated map) from a (dereffed) map grid -- used for picking up items, etc"
+  [grid location object]
+  (dosync
+   (alter grid dissoc-in location object)))
+
+
+;;TODO: remove when stable
+(comment(defn attach-to-worldgrid
   "Attach something to the worldgrid. Location is the player's currentlocation, a vector of keywords, like [:grid :buildings :buildingtype :grid :roomtype]; <:roomtype> being the room that is about to be attached. The second arg-- attachment -- is a vector of the room contents, in this example."
   [location object]
   (dosync
-   (alter worldgrid assoc-in location object)))
+   (alter worldgrid assoc-in location object))))
 
-
-(defn remove-from-worldgrid
+;;TODO remove when stable
+(comment (defn remove-from-worldgrid
   "Remove an object (and its associated map) from the worldgrid -- used for picking up items, etc"
   [location object]
   (dosync
-   (alter worldgrid dissoc-in location object)))
+   (alter worldgrid dissoc-in location object))))
+
+
+
+(defn connect-gridpoints
+  "takes an empty, single-level grid ref (not dereffed) and connects the gridpoints using cardinal directions as keywords"
+  [grid]
+  (doseq [address @grid]
+    ;; add cardinal directions
+    (let [coord (address 0)
+          x (coord 0)
+          y (coord 1)
+          
+          ;; new coordinates
+          north [x (+ y 1)]
+          south [x (- y 1)]
+          east  [(+ x 1) y]
+          west  [(- x 1) y]
+          
+          ;; do these coordinates exist on the grid?
+          north-exists (if (grid north) true false)
+          south-exists (if (grid south) true false)
+          east-exists (if (grid east) true false)
+          west-exists (if (grid west) true false)] ;; end let
+
+      (attach-to-grid grid [coord]
+                      {;; display coordinates in different directions
+                       :north (if north-exists north nil)
+                       :south (if south-exists south nil)
+                       :east (if east-exists east nil)
+                       :west (if west-exists west nil)
+                       }))))
+
+
+
+
 
 
 (defn choose-random-building-type
@@ -56,24 +107,27 @@
 
 
 (defn generate-buildings
-  "Takes a world-grid and generates buildings for each point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap. TODO: currently just adds four buildings to each coordinate."
-  []
+  "Takes a grid and generates buildings for each point.  Type of buildings is determined by the probability listed in the 'building type probability' hashmap. TODO: currently just adds four buildings to each coordinate."
+  [grid]
   ;; for each coordinate
-  (doseq [coord @worldgrid]
+  (doseq [coord @grid]
     ;; add a :buildings map with :east :west :south :north maps;
     ;; randomly choose a building type to place there.
-    (attach-to-worldgrid (vector (coord 0)) {:buildings {
-                        :east {(choose-random-building-type) {}}
-                        :west {(choose-random-building-type) {}}
-                        :north {(choose-random-building-type) {}}
-                        :south {(choose-random-building-type) {}}}})))
+    (attach-to-grid grid 
+                    (vector (coord 0)) {:buildings {
+                        :1 {(choose-random-building-type) {}}
+                        :2 {(choose-random-building-type) {}}
+                        :3 {(choose-random-building-type) {}}
+                        }})))
 
 
 (defn generate-world
   "Generate the city grid and buildings."
   [size]
-  (def worldgrid (ref (generate-grid size)))
-  (generate-buildings))
+  (do
+    (def worldgrid (ref (generate-grid size)))
+    (connect-gridpoints worldgrid)
+    (generate-buildings worldgrid)))
 
 
 
@@ -113,7 +167,7 @@
 
 (defn populate-space
   "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid, unit grid, and rooms for it; otherwise it's a single-room building and we just call the room-generation function."
-  []
+  [grid]
   (let
       [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
        multi-unit-types [:office-building :apartment-building]
@@ -121,26 +175,26 @@
     
     ;; if the building we're in is one of the single-unit types...
     (if (not (contains? multi-unit-types current-building-type))
-      (attach-to-worldgrid (player :currentlocation) (generate-room current-building-type))
+      (attach-to-grid @grid (player :currentlocation) (generate-room current-building-type))
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
-   (do (attach-to-worldgrid (player :currentlocation)
+   (do (attach-to-grid @grid (player :currentlocation)
         (generate-grid (rand-nth
         (get-in buildingtypes [current-building-type :min-max-grid-size]))))
      
      ;; at each newly generated 'unit', generate a 'rooms' grid
-       (doseq [coord (get-in @worldgrid (player :currentlocation))]
+       (doseq [coord (get-in @grid (player :currentlocation))]
               (let [unit (keyword (coord 0))]
                    ;; WORKS -- rooms grid
-                   (attach-to-worldgrid (conj (player :currentlocation) unit)
+                   (attach-to-grid @grid (conj (player :currentlocation) unit)
                                         (generate-grid 2))
 
   ;; for each room, generate room contents
   (doseq [roomsgrid (get-in @worldgrid (conj (player :currentlocation) unit))]
     (let [room (keyword (roomsgrid 0))]
          ;; attach rooms
-      (attach-to-worldgrid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
+      (attach-to-grid @grid (conj (conj (player :currentlocation) unit) room) (generate-room current-building-type))))))))))
 
 
 

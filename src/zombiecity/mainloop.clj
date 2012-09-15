@@ -21,5 +21,5 @@
     (while true
       (do
       (view-currentlocation)
-      (process-user-choice))
+      (process-user-choice worldgrid))
 )))
