@@ -40,7 +40,7 @@
         place (keyword playerchoice)]
    (do
      ;; place has to be in a list, because clojure returns a list for (keys gridlocation) but won't let me call 'first' on it; saying it's a keyword...arghhh.
-     (if (contains? (set (keys gridlocation)) place);;;;;;;;;;;;;;;;
+     (if (contains? gridlocation place);;;;;;;;;;;;;;;;
        ;; change the player's currentlocation to make the move
        (dosync
          (alter player assoc-in [:currentlocation] (conj (player :currentlocation) place)))
