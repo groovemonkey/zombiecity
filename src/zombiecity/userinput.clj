@@ -39,8 +39,12 @@
   (let [gridlocation (get-in @grid (player :currentlocation))
         place (keyword playerchoice)]
    (do
+     (println ;;"DEBUG: playerchoice was" playerchoice
+              ;;"\n\ngridlocation:" gridlocation
+              "\nplace is" place
+              "\n(set (keys gridlocation)) is" (set (keys gridlocation)))
      ;; place has to be in a list, because clojure returns a list for (keys gridlocation) but won't let me call 'first' on it; saying it's a keyword...arghhh.
-     (if (= (list place) (keys gridlocation))
+     (if (contains? (set (keys gridlocation)) place);;;;;;;;;;;;;;;;
        ;; change the player's currentlocation to make the move
        (dosync
          (alter player assoc-in [:currentlocation] (conj (player :currentlocation) place)))
@@ -49,7 +53,7 @@
      
      ;; if the place we just moved to is empty, generate stuff for it
      (cond (empty? gridlocation)
-                (populate-space grid)))))
+           (populate-space grid)))))
 
 
 (defn exit-location
@@ -64,13 +68,7 @@
   [grid]
   (let [currentview (get-in @grid (player :currentlocation))]
     
-    (println "DEBUG: currentview is" currentview)
-    
     (doseq [thing currentview]
-      ;;TODO: fix this crap. when you walk into a hairdresser's,
-      ;;everything crashes. Apartment buildings are even more fucked
-      ;;up. Get this working so we can move through the world, just to
-      ;;start with.
       (println "DEBUG: thing in the currentview is" thing)
       
       (cond (or (empty? thing) (nil? thing)) (println "There's nothing here!")
@@ -104,6 +102,7 @@
   (cond
    (= choice "look") (view-currentlocation grid)
    (= choice "move") (move grid (keyword (first args)))
+   (= playerchoice "move back") (exit-location)
    (= choice "leave") (exit-location)
    (= choice "take") (take-item grid args)
    (= choice "fight") (fight args)
