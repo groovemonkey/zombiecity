@@ -56,7 +56,7 @@
                           }
 
    :retail-waiting-area {
-                         :hairdresser {
+                         :hairdresser-waiting-area {
                                        :description "A few simple chairs and a leather couch, arranged around a magazine-covered coffee table. Fashion magazines. You shudder."
                                        ;; usable items have functions
                                        ;; that are run when they're used.

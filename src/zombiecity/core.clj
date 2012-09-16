@@ -154,7 +154,7 @@
   (let [chosenroom (keyword (rand-nth (flatten (into (vector) (conj (keys (get-in buildingtypes [building-type :allowed-rooms])) (keys (get-in buildingtypes [building-type :required-rooms])))))))]
 
     ;; build/return a hash map of :chosenroom [contents]
-    (hash-map chosenroom (into (vector) (flatten
+    (hash-map chosenroom (into (hash-map)
               
     ;; for each of this room's required and allowed furniture types
     (for [furniture-type (flatten (conj (get-in roomtypes [chosenroom :required-furniture]) (get-in roomtypes [chosenroom :allowed-furniture])))]
@@ -162,7 +162,7 @@
       ;; choose an actual item from that type
          (let [chosen-item (rand-nth (keys (get-in furnituretypes [furniture-type])))]
            (vector chosen-item (get-in furnituretypes [furniture-type chosen-item]))
-        )))))))
+        ))))))
    
 
 (defn populate-space
