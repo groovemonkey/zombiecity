@@ -34,21 +34,26 @@
 
 (defn move
   "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a LIST -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
-  [grid place]
-  (dosync
-   ;; TODO: check if the option is valid, i.e. if it can be seen from
-   ;; the player's currentlocation
-
-   ;; change the player's currentlocation to make the move
-   (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (keyword (first place)))))
-  
-  ;; if the place we just moved to is empty, generate some
-  ;; stuff for it 
-  ;;;;TODO: I smell an inventory exploit here (take
-  ;; everything from a closet, and it regenerates as soon as you go
-  ;; back into it). Fix that. ? Add a 'been-here' attribute to containers?
-  (cond (empty? (get-in @grid (player :currentlocation)))
-                (populate-space grid)))
+  [grid playerchoice]
+   ;; check if the option can be seen from the player's currentlocation
+  (let [gridlocation (get-in @grid (player :currentlocation))
+        place (keyword playerchoice)]
+   (do
+     (println "DEBUG: playerchoice was" playerchoice
+              "\n\ngridlocation:" gridlocation
+              "\nplace is" place
+              "\n(keys gridlocation) is" (keys gridlocation))
+     ;; place has to be in a list, because clojure returns a list for (keys gridlocation) but won't let me call 'first' on it; saying it's a keyword...arghhh.
+     (if (= (list place) (keys gridlocation))
+       ;; change the player's currentlocation to make the move
+       (dosync
+         (alter player assoc-in [:currentlocation] (conj (player :currentlocation) place)))
+       ;; else
+       (println "You chose a nonexistent option -- " place))
+     
+     ;; if the place we just moved to is empty, generate stuff for it
+     (cond (empty? gridlocation)
+                (populate-space grid)))))
 
 
 (defn exit-location
@@ -75,7 +80,7 @@
       (cond (or (empty? thing) (nil? thing)) (println "There's nothing here!")
             (vector? (rest thing)) (println "You see the following:\n" (rest thing))
             :else (do
-                    (println "\n\nYour current worldmap is\n\n" @grid "\n\nYou see a" (first thing) ", from which you have the following options:\n")
+                    (println "\n\nYou see a" (first thing) ", from which you have the following options:\n")
                     (doseq [one-further (get-in @grid (conj (player :currentlocation) (first thing)))]
                       (println (first one-further)))
                       )))))
@@ -102,7 +107,7 @@
         args (rest splitchoice)] ;; ("args" "in" "a" "list")
   (cond
    (= choice "look") (view-currentlocation grid)
-   (= choice "move") (move grid args)
+   (= choice "move") (move grid (keyword (first args)))
    (= choice "leave") (exit-location)
    (= choice "take") (take-item grid args)
    (= choice "fight") (fight args)
