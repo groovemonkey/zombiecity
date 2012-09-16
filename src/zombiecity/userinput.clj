@@ -39,10 +39,6 @@
   (let [gridlocation (get-in @grid (player :currentlocation))
         place (keyword playerchoice)]
    (do
-     (println "DEBUG: playerchoice was" playerchoice
-              "\n\ngridlocation:" gridlocation
-              "\nplace is" place
-              "\n(keys gridlocation) is" (keys gridlocation))
      ;; place has to be in a list, because clojure returns a list for (keys gridlocation) but won't let me call 'first' on it; saying it's a keyword...arghhh.
      (if (= (list place) (keys gridlocation))
        ;; change the player's currentlocation to make the move
