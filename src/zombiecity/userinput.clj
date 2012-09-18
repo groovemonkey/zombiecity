@@ -65,15 +65,21 @@
   (let [currentview (get-in @grid (player :currentlocation))]
     
     (doseq [thing currentview]
-      (println "DEBUG: thing in the currentview is" thing)
+      (println "DEBUG: (rest thing) in the currentview is" (rest thing))
       
-      (cond (or (empty? thing) (nil? thing)) (println "There's nothing here!")
+      (if (and
+            (not (= -1 (.indexOf [:north :south :east :west] (first thing)))) ;; if it's one of these four...
+            (not (= (rest thing) '(nil)))) ;; and it's not :direction nil...
+        (println "You can move" (first thing) "to another area.") ;; -- then it has a neighbor in that direction
+      
+        ;;else...
+      (cond (or (empty? thing) (nil? thing) (= '(nil) (rest thing))) ()
             (vector? (rest thing)) (println "You see the following:\n" (rest thing))
             :else (do
                     (println "\n\nYou see a" (first thing) ", from which you have the following options:\n")
                     (doseq [one-further (get-in @grid (conj (player :currentlocation) (first thing)))]
                       (println (first one-further)))
-                      )))))
+                      ))))))
 
 
 (defn fight
