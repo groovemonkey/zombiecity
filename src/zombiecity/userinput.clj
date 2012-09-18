@@ -32,13 +32,28 @@
         :else (println "There's no" target "to take.")))
 
 
+
+(defn exit-location
+  "remove the last item on the player's currentlocation vector. I.e. move them 'back' a step."
+  []
+  (dosync
+  (alter player assoc-in [:currentlocation] (pop (player :currentlocation)))))
+
+
 (defn move
   "move the player's currentlocation to a new point. Run necessary actions like building generation, etc. Takes a LIST -- building, direction; whatever is visible from the currentlocation -- as an argument and adds it to the currentlocation vector."
   [grid playerchoice]
    ;; check if the option can be seen from the player's currentlocation
-  (let [gridlocation (get-in @grid (player :currentlocation))
+  (let [gridlocation (get-in @grid (player :currentlocation)) ;; snapshot of what you see from your location on the grid
         place (keyword playerchoice)]
-   (do
+   (if (not (= -1 (.indexOf [:north :south :east :west] place)))
+     ;;; move in that direction
+     (do
+       (exit-location)
+       (dosync (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (gridlocation place)))))
+     
+     ;; else...
+    (do
      ;; place has to be in a list, because clojure returns a list for (keys gridlocation) but won't let me call 'first' on it; saying it's a keyword...arghhh.
      (if (contains? gridlocation place);;;;;;;;;;;;;;;;
        ;; change the player's currentlocation to make the move
@@ -49,14 +64,8 @@
      
      ;; if the place we just moved to is empty, generate stuff for it
      (cond (empty? gridlocation)
-           (populate-space grid)))))
+           (populate-space grid))))))
 
-
-(defn exit-location
-  "remove the last item on the player's currentlocation vector. I.e. move them 'back' a step."
-  []
-  (dosync
-  (alter player assoc-in [:currentlocation] (pop (player :currentlocation)))))
 
 
 (defn view-currentlocation
