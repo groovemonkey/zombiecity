@@ -114,11 +114,11 @@
     ;; add a :buildings map with :east :west :south :north maps;
     ;; randomly choose a building type to place there.
     (attach-to-grid grid 
-                    (vector (coord 0)) {:buildings {
+                    (vector (coord 0) :buildings) {
                         :1 {(choose-random-building-type) {}}
                         :2 {(choose-random-building-type) {}}
                         :3 {(choose-random-building-type) {}}
-                        }})))
+                        })))
 
 
 (defn generate-world
