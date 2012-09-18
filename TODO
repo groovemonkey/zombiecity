@@ -1,21 +1,20 @@
 Next Items On The To-Do List:
-	
--when you enter a building, a new grid/room is generated. Your currentlocation isn't updated to reflect that, which might be the problem.
+
+- abstracting the 'buildings' --> 1, 2, 3 crap. 
+	-BUGFIX? Maybe by creating a SET of 5 randomly rolled building-types? that way if it repeats, it won't be stored in the set/map?
+
+-when you enter a building, a new grid/room is generated. 
+	-when you enter, you have to do "move :building-name" TWICE to get inside.
 	-try doing room generation earlier? Or eliminating an "extra room" that's generated for single-room buildings like :hairdresser?
 	-BUGFIX? -- right after room creation, add the generated room name onto the end of the player's currentlocation?
+	
+	
 	
 	
 - ADD FURNITURE AND ITEMS FOR AUTO-GENERATION TESTING!!!
 
 Minor: 
 - core/generate-room - fill containers?
-
-
-#################
-IF ON GRIDPOINT:
-
-"West, you see a an apartment building."
-(typing 'west' gets me to the apartment building without having to type "buildings -- west -- apartment-building")
 
 
 #################

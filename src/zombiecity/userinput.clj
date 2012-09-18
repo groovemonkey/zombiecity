@@ -72,10 +72,9 @@
   "looks around at the objects visible at the current playerlocation, and displays the options 'one up the chain' from there."
   [grid]
   (let [currentview (get-in @grid (player :currentlocation))]
-    
+    (do (println "You're standing in a" (last (player :currentlocation))) ;; get the name of the current space
     (doseq [thing currentview]
-      (println "DEBUG: (rest thing) in the currentview is" (rest thing))
-      
+      ;;(println "DEBUG: (rest thing) in the currentview is" (rest thing))
       (if (and
             (not (= -1 (.indexOf [:north :south :east :west] (first thing)))) ;; if it's one of these four...
             (not (= (rest thing) '(nil)))) ;; and it's not :direction nil...
@@ -88,7 +87,7 @@
                     (println "\n\nYou see a" (first thing) ", from which you have the following options:\n")
                     (doseq [one-further (get-in @grid (conj (player :currentlocation) (first thing)))]
                       (println (first one-further)))
-                      ))))))
+                      )))))))
 
 
 (defn fight
