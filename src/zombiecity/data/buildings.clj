@@ -7,6 +7,7 @@
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    :apartment-building {
+                        :multi-unit true
                         :min-max-grid-size [2 3 4 5 6] ;; UNUSED list
                         :max-stories [1 2 3 4 5 6 7] ;; UNUSED - max stories it can have
                         :min-max-rooms [3, 10] ;; UNUSED - each
@@ -36,8 +37,20 @@
                  :required-rooms {:hairdresser-room 1}
                  :allowed-rooms {}
                  }
+   
+   :diner {
+          :max-stories 1
+          :min-max-rooms 1
+          :required-rooms {:diner-room 1}
+          :allowed-rooms {}
+          }
 
-
+   :gun-shop {
+              :max-stories 1
+              :min-max-rooms 1
+              :required-rooms {:gunshop-room 1}
+              :allowed-rooms {}
+              }
 
 
    }

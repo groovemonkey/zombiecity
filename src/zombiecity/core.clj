@@ -66,7 +66,7 @@
 
 
 (defn connect-gridpoints
-  "takes an empty, single-level grid ref (not dereffed) and connects the gridpoints using cardinal directions as keywords"
+  "takes an empty, single-level map REF and connects the gridpoints using cardinal directions as keywords"
   [grid]
   (doseq [address @grid]
     ;; add cardinal directions
@@ -126,8 +126,8 @@
   [size]
   (do
     (def worldgrid (ref (generate-grid size)))
-    (connect-gridpoints worldgrid)
-    (generate-buildings worldgrid)))
+      (connect-gridpoints worldgrid)
+      (generate-buildings worldgrid)))
 
 
 
@@ -169,33 +169,43 @@
   "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid, unit grid, and rooms for it; otherwise it's a single-room building and we just call the room-generation function."
   [grid]
   (let
-      [single-unit-types [:hairdresser :gun-shop :kitchen :bedroom :bathroom :living-room]
-       multi-unit-types [:office-building :apartment-building]
-       currentlocation (@player :currentlocation)
-       current-building-type (return-current-buildingtype currentlocation)]
-    
+      [currentlocation (@player :currentlocation)
+       current-building-type (return-current-buildingtype currentlocation)
+       multi-unit? (get-in buildingtypes [current-building-type :multi-unit])]
+      
     ;; if the building we're in is one of the single-unit types...
-    (if (not (contains? multi-unit-types current-building-type))
-      (attach-to-grid grid currentlocation (generate-room current-building-type))
+      (if (not multi-unit?)
+        (attach-to-grid grid currentlocation (generate-room current-building-type))
 
    ;; otherwise: generate a grid, using the values 
    ;; from the building-type's :min-max-grid-size attribute.
-   (do (attach-to-grid grid currentlocation
-        (generate-grid (rand-nth
-        (get-in buildingtypes [current-building-type :min-max-grid-size]))))
+   (do 
+     (let [buildinggrid (ref (generate-grid (rand-nth
+                                              (get-in buildingtypes [current-building-type :min-max-grid-size]))))]
+     (connect-gridpoints buildinggrid)
+     (attach-to-grid grid currentlocation @buildinggrid))
      
      ;; at each newly generated 'unit', generate a 'rooms' grid
+     ;;FIXME: THIS IS WHERE IT ALL GOES TO HELL
        (doseq [coord (get-in @grid currentlocation)]
-              (let [unit (keyword (coord 0))]
+         
+         ;; unless the coord is one of the cardinal directions...
+         (if (= -1 (.indexOf [:north :south :east :west] coord))
+              (let [unit (coord 0)]
+                (do
                    ;; WORKS -- rooms grid
-                   (attach-to-grid grid (conj currentlocation unit)
-                                        (generate-grid 2))
+                  (let [unit (ref (generate-grid 2))] ;; make a new grid, store as ref
+                   (attach-to-grid grid (conj currentlocation unit) ;; attach the new grid, with directions, to the worldgrid
+                                        (connect-gridpoints unit))) ;; add cardinal directions
 
-  ;; for each room, generate room contents
-  (doseq [roomsgrid (get-in @worldgrid (conj currentlocation unit))]
-    (let [room (keyword (roomsgrid 0))]
-         ;; attach rooms
-      (attach-to-grid grid (conj (conj currentlocation unit) room) (generate-room current-building-type))))))))))
+                   ;; for each room, generate room contents
+                   (doseq [roomsgrid (get-in @grid (conj currentlocation unit))]
+                     (let [room (roomsgrid 0)]
+                       ;; attach rooms
+                       (attach-to-grid grid (conj (conj currentlocation unit) room) (generate-room current-building-type))))))))
+
+     ;; lastly, move player to gridpoint 0,0 in the new building grid
+     (dosync (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (vector 0 0))))))))
 
 
 

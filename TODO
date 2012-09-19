@@ -3,11 +3,17 @@ Next Items On The To-Do List:
 - abstracting the 'buildings' --> 1, 2, 3 crap. 
 	-BUGFIX? Maybe by creating a SET of 5 randomly rolled building-types? that way if it repeats, it won't be stored in the set/map?
 
--when you enter a building, a new grid/room is generated. 
+-when you enter a building, a new grid/room is generated.
+	-1: fix generated grid for multi-unit buildings (output is in test.clj)
 	-when you enter, you have to do "move :building-name" TWICE to get inside.
 	-try doing room generation earlier? Or eliminating an "extra room" that's generated for single-room buildings like :hairdresser?
 	-BUGFIX? -- right after room creation, add the generated room name onto the end of the player's currentlocation?
 	
+- when you're in a room, it treats items like other locations; throws up when trying to treat an item description as a map.
+	-BUGFIX? some kind of check to make sure the thing we're about to list is in the official roomtypes map?
+	
+	
+- gameplay: roll for a zombie-encounter every time you change gridpoints? YEAH!
 	
 	
 	

@@ -73,6 +73,7 @@
   [grid]
   (let [currentview (get-in @grid (player :currentlocation))]
     (do (println "You're standing in a" (last (player :currentlocation))) ;; get the name of the current space
+      (println "your current location is" (player :currentlocation))
     (doseq [thing currentview]
       ;;(println "DEBUG: (rest thing) in the currentview is" (rest thing))
       (if (and
