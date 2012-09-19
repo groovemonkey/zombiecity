@@ -164,6 +164,29 @@
            (vector chosen-item (get-in furnituretypes [furniture-type chosen-item]))
         ))))))
    
+;;FIXME: THIS IS WHERE IT ALL GOES TO HELL
+(defn add-rooms
+  [grid]
+  "takes a building-grid ref and adds rooms at each coord"
+   ;; at each newly generated 'unit', generate a 'rooms' grid
+       ;;(doseq [coord (get-in @grid currentlocation)]
+   (doseq [address @grid]
+    (let [coord (address 0)
+          current-building-type (return-current-buildingtype (@player :currentlocation))]
+      
+         ;; unless the coord is one of the cardinal directions...
+          (if (= -1 (.indexOf [:north :south :east :west] coord))
+           
+                   ;; add grid for each apartment unit
+              (let [unitgrid (ref (generate-grid 2))] ;; make a new grid, store as ref
+                (do (attach-to-grid grid (vector coord) @unitgrid) ;; attach the new grid, to the apartment unit on the worldgrid
+                                   ;; (connect-gridpoints unitgrid) ;; add cardinal directions
+
+                  (doseq [unit @unitgrid]
+                    (let [room (unit 0)]
+                   ;; for each room, generate and attach room contents -- apt: [0 1] [unit] room = [coord] [unit] makearoom
+                       (attach-to-grid grid (conj (vector coord) room) (generate-room current-building-type))))))))))
+
 
 (defn populate-space
   "Generate the contents of the player's currentlocation, based on type. If it's a multi-unit or multi-room building, generate a grid, unit grid, and rooms for it; otherwise it's a single-room building and we just call the room-generation function."
@@ -183,26 +206,8 @@
      (let [buildinggrid (ref (generate-grid (rand-nth
                                               (get-in buildingtypes [current-building-type :min-max-grid-size]))))]
      (connect-gridpoints buildinggrid)
+     (add-rooms buildinggrid)
      (attach-to-grid grid currentlocation @buildinggrid))
-     
-     ;; at each newly generated 'unit', generate a 'rooms' grid
-     ;;FIXME: THIS IS WHERE IT ALL GOES TO HELL
-       (doseq [coord (get-in @grid currentlocation)]
-         
-         ;; unless the coord is one of the cardinal directions...
-         (if (= -1 (.indexOf [:north :south :east :west] coord))
-              (let [unit (coord 0)]
-                (do
-                   ;; WORKS -- rooms grid
-                  (let [unit (ref (generate-grid 2))] ;; make a new grid, store as ref
-                   (attach-to-grid grid (conj currentlocation unit) ;; attach the new grid, with directions, to the worldgrid
-                                        (connect-gridpoints unit))) ;; add cardinal directions
-
-                   ;; for each room, generate room contents
-                   (doseq [roomsgrid (get-in @grid (conj currentlocation unit))]
-                     (let [room (roomsgrid 0)]
-                       ;; attach rooms
-                       (attach-to-grid grid (conj (conj currentlocation unit) room) (generate-room current-building-type))))))))
 
      ;; lastly, move player to gridpoint 0,0 in the new building grid
      (dosync (alter player assoc-in [:currentlocation] (conj (player :currentlocation) (vector 0 0))))))))
